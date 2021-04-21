@@ -1,13 +1,12 @@
 import MeetupDetail from '../../components/meetups/MeetupDetail';
 
 const MeetupDetails = props => {
-  console.log(props);
   return <MeetupDetail props={props.meetupData} />;
 };
 
 export async function getStaticPaths() {
   return {
-    fallback:false,
+    fallback: false,
     paths: [
       {
         params: {
@@ -25,7 +24,7 @@ export async function getStaticPaths() {
 export async function getStaticProps(context) {
   // fetch data from API
   const meetupId = context.params.meetupId;
-  console.log(meetupId);
+
   return {
     props: {
       meetupData: {

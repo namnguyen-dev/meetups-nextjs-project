@@ -1,44 +1,38 @@
-import MeetupList from '../components/meetups/MeetupList';
+import { MongoClient } from 'mongodb';
 
-export const DUMMY_MEETUPS = [
-  {
-    id: 'm1',
-    title: 'First Meetup',
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaHuiaXbpzIVHWtElYWW8tAFs5lCKIPm7AMviBW0U5R-ZLuHolcF4X5aGT5I29qlC2LVs&usqp=CAU',
-    address: 'Bangkok',
-    description: 'Meet us in Bangkok',
-  },
-  {
-    id: 'm2',
-    title: '2nd Meetup',
-    image:
-      'https://content.phuket101.net/wp-content/uploads/20180818185539/phuket-on-budget1.jpg',
-    address: 'Phuket',
-    description: 'Meet us in Phuket',
-  },
-];
+import MeetupList from '../components/meetups/MeetupList';
 
 function HomePage(props) {
   return <MeetupList meetups={props.meetups} />;
 }
 
-
-// export async function getServerSideProps(context){
-//   const req = contetx.req
-//   const res = contetx.res
-//   // fetch data from an API
-//   return {
-//     props:{
-//       meetups: DUMMY_MEETUPS
-//     }
-//   }
-// }
 export async function getStaticProps() {
   // fetch data from an API
+  const client = await MongoClient.connect(
+    'mongodb+srv://Nam-Nguyen-1990:vrmRmr4M3uljj9ij@cluster0.wnjfl.mongodb.net/meetups?retryWrites=true&w=majority'
+  );
+
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const meetups = await meetupsCollection.find().toArray();
+
+  client.close();
+
   return {
     props: {
-      meetups: DUMMY_MEETUPS,
+      meetups: meetups.map(meetup => {
+        const { title, address, image, description, _id } = meetup;
+
+        return {
+          title,
+          address,
+          image,
+          description,
+          id: _id.toString(),
+        };
+      }),
     },
     revalidate: 10,
   };
